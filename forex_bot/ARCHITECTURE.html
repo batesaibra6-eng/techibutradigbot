@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Forex Bot — Architecture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d1117;
+    color: #c9d1d9;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    padding: 30px;
+    min-height: 100vh;
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.6em;
+    color: #58a6ff;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .subtitle {
+    text-align: center;
+    color: #8b949e;
+    font-size: 0.85em;
+    margin-bottom: 30px;
+  }
+
+  /* ── PIPELINE ── */
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 900px;
+    margin: 0 auto 40px;
+  }
+  .layer {
+    width: 100%;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 14px 20px;
+    background: #161b22;
+    position: relative;
+  }
+  .layer-title {
+    font-size: 0.72em;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+  }
+  .boxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .box {
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 0.8em;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .arrow {
+    width: 2px;
+    height: 22px;
+    background: #30363d;
+    margin: 0 auto;
+    position: relative;
+  }
+  .arrow::after {
+    content: '▼';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #30363d;
+    font-size: 0.9em;
+  }
+
+  /* colour palettes */
+  .c-blue   { background: #0d2744; color: #58a6ff; border: 1px solid #1f6feb; }
+  .c-green  { background: #0d2a18; color: #3fb950; border: 1px solid #238636; }
+  .c-purple { background: #21143a; color: #c084fc; border: 1px solid #8b5cf6; }
+  .c-orange { background: #2e1a00; color: #fb8500; border: 1px solid #bd6f00; }
+  .c-red    { background: #2d0f0f; color: #f85149; border: 1px solid #da3633; }
+  .c-teal   { background: #0a2929; color: #39d0d8; border: 1px solid #1a7a80; }
+  .c-gold   { background: #2e2400; color: #e3b341; border: 1px solid #9e6a03; }
+  .c-pink   { background: #2e0f24; color: #f778ba; border: 1px solid #b4478a; }
+  .c-gray   { background: #1a1f26; color: #8b949e; border: 1px solid #30363d; }
+
+  .layer.l0 { border-color: #1f6feb; }
+  .layer.l1 { border-color: #238636; }
+  .layer.l2 { border-color: #8b5cf6; }
+  .layer.l3 { border-color: #bd6f00; }
+  .layer.l4 { border-color: #da3633; }
+  .layer.l5 { border-color: #1a7a80; }
+  .layer.l6 { border-color: #9e6a03; }
+  .layer.l7 { border-color: #b4478a; }
+  .layer.l8 { border-color: #30363d; }
+
+  /* ── FLOW TABLE ── */
+  .flow-section {
+    max-width: 900px;
+    margin: 0 auto 30px;
+  }
+  .flow-section h2 {
+    color: #58a6ff;
+    font-size: 1em;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #30363d;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82em;
+  }
+  th {
+    background: #1f2937;
+    color: #8b949e;
+    text-transform: uppercase;
+    font-size: 0.75em;
+    letter-spacing: 1px;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #30363d;
+  }
+  td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #21262d;
+    vertical-align: top;
+  }
+  tr:hover td { background: #161b22; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.78em;
+    font-weight: 600;
+  }
+
+  /* ── METRICS ── */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    max-width: 900px;
+    margin: 0 auto 30px;
+  }
+  .metric-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+  .metric-val {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: #58a6ff;
+  }
+  .metric-label {
+    font-size: 0.72em;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+
+  footer {
+    text-align: center;
+    color: #30363d;
+    font-size: 0.75em;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<h1>⚡ Institutional Forex Trading Bot</h1>
+<p class="subtitle">System Architecture — Production Grade | Python + MetaTrader 5 + XGBoost</p>
+
+<!-- ── METRICS ── -->
+<div class="metrics">
+  <div class="metric-card"><div class="metric-val">10</div><div class="metric-label">Symbols</div></div>
+  <div class="metric-card"><div class="metric-val">7</div><div class="metric-label">Timeframes</div></div>
+  <div class="metric-card"><div class="metric-val">15</div><div class="metric-label">AI Features</div></div>
+  <div class="metric-card"><div class="metric-val">55/100</div><div class="metric-label">AI Threshold</div></div>
+  <div class="metric-card"><div class="metric-val">1%</div><div class="metric-label">Risk / Trade</div></div>
+  <div class="metric-card"><div class="metric-val">4%</div><div class="metric-label">Daily DD Limit</div></div>
+  <div class="metric-card"><div class="metric-val">3</div><div class="metric-label">Max Positions</div></div>
+  <div class="metric-card"><div class="metric-val">24/7</div><div class="metric-label">Operation</div></div>
+</div>
+
+<!-- ── PIPELINE ── -->
+<div class="pipeline">
+
+  <div class="layer l0">
+    <div class="layer-title">📡 Data Layer — MT5 Connector</div>
+    <div class="boxes">
+      <span class="box c-blue">mt5.connector</span>
+      <span class="box c-blue">OHLCV Candles (7 TFs)</span>
+      <span class="box c-blue">Live Tick Feed</span>
+      <span class="box c-blue">Account Info</span>
+      <span class="box c-blue">Position Tracking</span>
+      <span class="box c-blue">Auto-Reconnect</span>
+    </div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="layer l1">
+    <div class="layer-title">🏗 Higher Timeframe Bias Engine — W1 → D1 → H4 → H1</div>
+    <div class="boxes">
+      <span class="box c-green">Market Structure Analyzer</span>
+      <span class="box c-green">HH / HL / LH / LL</span>
+      <span class="box c-green">BOS Detection</span>
+      <span class="box c-green">CHOCH Detection</span>
+      <span class="box c-green">Weighted Bias Vote</span>
+      <span class="box c-green">Bias Strength 0–1</span>
+    </div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="layer l2">
+    <div class="layer-title">🎯 Institutional Zone Engine — H4 + H1</div>
+    <div class="boxes">
+      <span class="box c-purple">Supply Zones</span>
+      <span class="box c-purple">Demand Zones</span>
+      <span class="box c-purple">Rally-Base-Drop</span>
+      <span class="box c-purple">Drop-Base-Rally</span>
+      <span class="box c-purple">Strength Score 0–10</span>
+      <span class="box c-purple">Freshness Tracking</span>
+      <span class="box c-purple">Retest Count</span>
+    </div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="layer l3">
+    <div class="layer-title">💧 Liquidity Engine — M30 / M15 / M5</div>
+    <div class="boxes">
+      <span class="box c-orange">Equal Highs (EQH)</span>
+      <span class="box c-orange">Equal Lows (EQL)</span>
+      <span class="box c-orange">Buy-Side Liquidity (BSL)</span>
+      <span class="box c-orange">Sell-Side Liquidity (SSL)</span>
+      <span class="box c-orange">Sweep Detection</span>
+      <span class="box c-orange">Stop Hunt ID</span>
+    </div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="layer l4">
+    <div class="layer-title">📊 Order Flow Engine — M30 / M15 / M5</div>
+    <div class="boxes">
+      <span class="box c-red">Volume Delta</span>
+      <span class="box c-red">CVD (Cumulative)</span>
+      <span class="box c-red">Buying Pressure</span>
+      <span class="box c-red">Selling Pressure</span>
+      <span class="box c-red">Absorption Detection</span>
+      <span class="box c-red">Volume Imbalance</span>
+      <span class="box c-red">Flow Score 0–100</span>
+    </div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="layer l5">
+    <div class="layer-title">📐 CRT + Turtle Soup Strategy Engine</div>
+    <div class="boxes">
+      <span class="box c-teal">HTF Bias ✓</span>
+      <span class="box c-teal">Zone Alignment ✓</span>
+      <span class="box c-teal">Liquidity Sweep ✓</span>
+      <span class="box c-teal">Structure Shift ✓</span>
+      <span class="box c-teal">Order Flow ✓</span>
+      <span class="box c-teal">SL / TP1 / TP2 Calc</span>
+      <span class="box c-teal">RR Validation ≥ 1.5R</span>
+    </div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="layer l6">
+    <div class="layer-title">🤖 AI Signal Scorer — XGBoost</div>
+    <div class="boxes">
+      <span class="box c-gold">15 Feature Vector</span>
+      <span class="box c-gold">XGBoost Classifier</span>
+      <span class="box c-gold">Score 0–100</span>
+      <span class="box c-gold">Threshold ≥ 55</span>
+      <span class="box c-gold">Rule Fallback</span>
+      <span class="box c-gold">Synthetic Bootstrap</span>
+      <span class="box c-gold">Auto-Retraining</span>
+    </div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="layer l7">
+    <div class="layer-title">🛡 Risk Manager + Trade Execution</div>
+    <div class="boxes">
+      <span class="box c-pink">Dynamic Lot Sizing</span>
+      <span class="box c-pink">1% Risk / Trade</span>
+      <span class="box c-pink">4% Daily DD Limit</span>
+      <span class="box c-pink">Max 3 Positions</span>
+      <span class="box c-pink">MT5 Market Order</span>
+      <span class="box c-pink">TP1 Partial Close (50%)</span>
+      <span class="box c-pink">Break-Even SL</span>
+    </div>
+  </div>
+  <div class="arrow"></div>
+
+  <div class="layer l8">
+    <div class="layer-title">💾 Persistence + Notifications + Learning Loop</div>
+    <div class="boxes">
+      <span class="box c-gray">SQLite DB</span>
+      <span class="box c-gray">Telegram Alerts</span>
+      <span class="box c-gray">Rotating Logs</span>
+      <span class="box c-gray">Daily/Weekly Reports</span>
+      <span class="box c-gray">AI Training Queue</span>
+      <span class="box c-gray">Task Scheduler (24/7)</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── SIGNAL FLOW TABLE ── -->
+<div class="flow-section">
+  <h2>📋 Signal Condition Matrix</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Condition</th>
+        <th>LONG</th>
+        <th>SHORT</th>
+        <th>Mandatory</th>
+        <th>Source</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>Higher Timeframe Bias</td>
+        <td><span class="badge c-green">Bullish</span></td>
+        <td><span class="badge c-red">Bearish</span></td>
+        <td><span class="badge c-orange">✓ Yes</span></td>
+        <td>W1/D1/H4/H1 Vote</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Fresh Zone Presence</td>
+        <td><span class="badge c-green">Demand Zone</span></td>
+        <td><span class="badge c-red">Supply Zone</span></td>
+        <td><span class="badge c-orange">✓ Yes</span></td>
+        <td>S/D Engine H4+H1</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Liquidity Sweep</td>
+        <td><span class="badge c-green">SSL Swept</span></td>
+        <td><span class="badge c-red">BSL Swept</span></td>
+        <td><span class="badge c-orange">✓ Yes</span></td>
+        <td>Liquidity Engine</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Structure Shift</td>
+        <td><span class="badge c-green">CHOCH/BOS Up</span></td>
+        <td><span class="badge c-red">CHOCH/BOS Down</span></td>
+        <td><span class="badge c-orange">✓ Yes</span></td>
+        <td>MS Analyzer</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Order Flow</td>
+        <td><span class="badge c-green">Score &gt; 55</span></td>
+        <td><span class="badge c-red">Score &lt; 45</span></td>
+        <td><span class="badge c-gray">Scored</span></td>
+        <td>OF Engine</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>AI Score Filter</td>
+        <td colspan="2" style="text-align:center"><span class="badge c-gold">≥ 55 / 100</span></td>
+        <td><span class="badge c-orange">✓ Yes</span></td>
+        <td>XGBoost AI</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>RR Ratio</td>
+        <td colspan="2" style="text-align:center"><span class="badge c-gold">≥ 1.5R</span></td>
+        <td><span class="badge c-orange">✓ Yes</span></td>
+        <td>Risk Manager</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>Session Filter</td>
+        <td colspan="2" style="text-align:center"><span class="badge c-teal">London / NY / Overlap</span></td>
+        <td><span class="badge c-orange">✓ Yes</span></td>
+        <td>Core Scanner</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="flow-section">
+  <h2>📁 Module Map</h2>
+  <table>
+    <thead>
+      <tr><th>Module</th><th>File</th><th>Responsibility</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="badge c-blue">mt5</span></td><td>mt5/connector.py</td><td>MT5 terminal connection, orders, history</td></tr>
+      <tr><td><span class="badge c-green">market_structure</span></td><td>market_structure/analyzer.py</td><td>HH/HL, BOS, CHOCH, bias determination</td></tr>
+      <tr><td><span class="badge c-purple">strategy</span></td><td>strategy/supply_demand.py</td><td>Institutional zone detection</td></tr>
+      <tr><td><span class="badge c-teal">strategy</span></td><td>strategy/crt_turtle_soup.py</td><td>Signal generation logic</td></tr>
+      <tr><td><span class="badge c-orange">liquidity</span></td><td>liquidity/engine.py</td><td>EQH/EQL, sweeps, stop hunts</td></tr>
+      <tr><td><span class="badge c-red">order_flow</span></td><td>order_flow/engine.py</td><td>Volume delta, CVD, flow score</td></tr>
+      <tr><td><span class="badge c-gold">ai</span></td><td>ai/signal_scorer.py</td><td>XGBoost scoring + retraining</td></tr>
+      <tr><td><span class="badge c-pink">risk</span></td><td>risk/manager.py</td><td>Lot sizing, drawdown, exposure</td></tr>
+      <tr><td><span class="badge c-blue">core</span></td><td>core/scanner.py</td><td>Multi-TF orchestrator</td></tr>
+      <tr><td><span class="badge c-blue">core</span></td><td>core/trade_manager.py</td><td>Trade lifecycle, TP1, break-even</td></tr>
+      <tr><td><span class="badge c-gray">telegram</span></td><td>telegram/notifier.py</td><td>All Telegram notifications</td></tr>
+      <tr><td><span class="badge c-gray">storage</span></td><td>storage/database.py</td><td>SQLite persistence layer</td></tr>
+      <tr><td><span class="badge c-gray">core</span></td><td>core/reporting.py</td><td>Daily/weekly performance reports</td></tr>
+      <tr><td><span class="badge c-gold">main</span></td><td>main.py</td><td>Entry point, main loop, crash recovery</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<footer>Institutional Forex Trading Bot — CRT + Turtle Soup + AI | Python + MT5 + XGBoost</footer>
+</body>
+</html>

@@ -1,0 +1,11 @@
+2026-06-02 09:42:06 | WARNING  | forex_bot.risk.manager         | Daily drawdown exceeded: 5.00% (max 4.00%)
+2026-06-02 09:42:07 | INFO     | forex_bot.ai.signal_scorer     | Bootstrapping AI model with 500 synthetic samples…
+2026-06-02 09:42:07 | INFO     | forex_bot.ai.signal_scorer     | AI model trained and saved. Samples=500
+2026-06-02 09:42:07 | INFO     | forex_bot.ai.signal_scorer     | AI model loaded from storage/ai_model.pkl
+2026-06-02 09:42:07 | INFO     | forex_bot.storage.database     | Database initialised at storage/test_bot.db
+2026-06-02 09:42:07 | INFO     | forex_bot.storage.database     | Database initialised at storage/test_bot.db
+2026-06-02 09:43:31 | WARNING  | forex_bot.risk.manager         | Daily drawdown exceeded: 5.00% (max 4.00%)
+2026-06-02 09:43:31 | INFO     | forex_bot.ai.signal_scorer     | AI model loaded from storage/ai_model.pkl
+2026-06-02 09:43:31 | INFO     | forex_bot.ai.signal_scorer     | AI model loaded from storage/ai_model.pkl
+2026-06-02 09:43:31 | INFO     | forex_bot.storage.database     | Database initialised at storage/test_bot.db
+2026-06-02 09:43:31 | INFO     | forex_bot.storage.database     | Database initialised at storage/test_bot.db

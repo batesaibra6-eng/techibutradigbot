@@ -1,0 +1,26 @@
+# ==============================================================================
+# INSTITUTIONAL FOREX BOT — Python Requirements
+# ==============================================================================
+# Install with: pip install -r requirements.txt
+
+# MetaTrader 5 integration
+MetaTrader5>=5.0.45
+
+# Data processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Machine Learning
+xgboost>=2.0.0
+scikit-learn>=1.3.0
+
+# HTTP requests (Telegram API)
+requests>=2.31.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# Optional: Jupyter for analysis
+# jupyter>=1.0.0
+# matplotlib>=3.7.0
+# seaborn>=0.12.0
