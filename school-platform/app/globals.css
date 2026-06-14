@@ -3,29 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --primary-green: #0a5c36;
-  --accent-gold: #c5a14a;
-  --dark-navy: #0f172a;
+  --primary: #0a5c36;
+  --accent: #c5a14a;
 }
 
 body {
   font-family: var(--font-geist-sans);
 }
 
-/* Custom styles for school branding */
-.school-hero {
-  background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.75)), url('/uploads/compund view.jpg');
-  background-size: cover;
-  background-position: center;
-}
-
 .nav-link {
   position: relative;
-  transition: color 0.2s ease;
-}
-
-.nav-link:hover {
-  color: #c5a14a;
 }
 
 .nav-link:after {
@@ -35,20 +22,12 @@ body {
   height: 2px;
   bottom: -2px;
   left: 0;
-  background-color: #c5a14a;
+  background-color: var(--accent);
   transition: width 0.3s ease;
 }
 
 .nav-link:hover:after {
   width: 100%;
-}
-
-.gallery-img {
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.gallery-img:hover {
-  transform: scale(1.05);
 }
 
 .portal-card {
@@ -57,5 +36,4 @@ body {
 
 .portal-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
