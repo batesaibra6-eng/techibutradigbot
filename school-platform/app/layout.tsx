@@ -15,21 +15,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Mayuge Light Secondary School | Excellence in Education",
-  description: "Mayuge Light Secondary School - Nurturing Excellence, Building Futures. A premier secondary school in Uganda offering quality education from O-Level to A-Level.",
-  icons: {
-    icon: "/favicon.ico",
-  },
+  title: "Mayuge Light Secondary School",
+  description: "Nurturing Excellence. Building Futures.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
